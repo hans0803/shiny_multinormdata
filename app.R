@@ -6,7 +6,7 @@ library(MASS) # for lda
 
 ui <- fluidPage(
   
-  title = "611011106_hans_shinydemo",
+  title = "Multinormal Data Builder",
   titlePanel("Multinormal Data Builder"),
   
   sidebarLayout(
@@ -14,6 +14,9 @@ ui <- fluidPage(
     sidebarPanel(
       
       tags$h4("Design by Hans"),
+      tags$a(href="https://github.com/hans0803", "This is my GitHub Link!"),
+      
+      tags$h6(""),
       downloadButton("downloadData", "Download Data"),
       
       tags$h5("(1) Seed is random?"),
