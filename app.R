@@ -16,45 +16,48 @@ ui <- fluidPage(
       tags$h4("Design by Hans"),
       downloadButton("downloadData", "Download Data"),
       
-      tags$h5("(1) Mean range for every p"),
+      tags$h5("(1) Seed is random?"),
+      selectInput(inputId = "random",
+                  label = "Random:",
+                  choices = c(FALSE, TRUE)
+      ),
+      
+      tags$h5("(2) Mean range for every p"),
       sliderInput(inputId = "mrange",
                   label = "Choose a mean range:",
                   min = 1, max = 10, value = 1, step = 1,
                   animate = animationOptions(interval = 1000, loop = FALSE)
       ),
       
-      tags$h5("(2) P count about every multinorm"),
+      tags$h5("(3) P count about every multinorm"),
       sliderInput(inputId = "ncount",
                   label = "Number of P:",
                   min = 2, max = 7, value = 2, step = 1,
                   animate = animationOptions(interval = 1000, loop = FALSE)
       ),
       
-      tags$h5("(3) Variable class count"),
+      tags$h5("(4) Variable class count"),
       sliderInput(inputId = "tcount",
                   label = "Number of classes:",
                   min = 3, max = 7, value = 3, step = 1,
                   animate = animationOptions(interval = 1000, loop = FALSE)
       ),
       
-      tags$h5("(4) Resolution of digit"),
+      tags$h5("(5) Resolution of digit"),
       sliderInput(inputId = "resolution",
                   label = "Digits:",
                   min = 0, max = 7, value = 2, step = 1,
                   animate = animationOptions(interval = 1000, loop = FALSE)
       ),
       
-      tags$h5("(5) Is last two class multicollinearity?"),
+      tags$h5("(6) Is Data has multicollinearity problem?
+              if false please enter who"),
       selectInput(inputId = "multicol",
                   label = "Multicollinearity:",
                   choices = c(FALSE, TRUE)
       ),
-      
-      tags$h5("(6) Seed is random?"),
-      selectInput(inputId = "random",
-                  label = "Random:",
-                  choices = c(FALSE, TRUE)
-      ),
+      textInput(inputId = 'who', 
+                label = 'Who? enter a vector:', "1,2"),
       
       tags$h5("(7) Is every class n count balance?
               if unbalance, pleace input n's vector"),
@@ -69,6 +72,8 @@ ui <- fluidPage(
     
     mainPanel(
       
+      
+      
       tabsetPanel(selected="PCA",
                   tabPanel("PCA", 
                            tags$h3("This is PCA plot"),
@@ -81,6 +86,12 @@ ui <- fluidPage(
                            plotOutput(outputId = "distPlot2"),
                            tags$h3("Mean of every P in every classes"),
                            tableOutput("view2")
+                  ),
+                  tabPanel("t-SNE", 
+                           tags$h3("This is t-SNE plot"),
+                           plotOutput(outputId = "distPlot3"),
+                           tags$h3("Mean of every P in every classes"),
+                           tableOutput("view3")
                   )
       ),
       
@@ -117,7 +128,18 @@ server <- function(input, output) {
       d_df     <- rbind(d_df, now_df)
     }
     
+    if(input$multicol==TRUE){
+      whos <- as.numeric(unlist(strsplit(input$who,",")))
+      whos_mean <- d_mean[whos[1],]
+      
+      for(who in whos[-1]){
+        d_df[which(d_df[,1]==who),] <- cbind(who, rmvnorm(n=n[who], mean=whos_mean)+rnorm(n[who]))
+        d_mean[who,] <- whos_mean
+      }
+    }
+    
     d_df[,-1] <- round(d_df[,-1], input$resolution)
+    colnames(d_df)[1] <- "class"
     
     output$view1 <- renderTable({
       mean_class <- as.data.frame(1:input$tcount)
@@ -125,27 +147,6 @@ server <- function(input, output) {
       d_mean <- cbind(mean_class, d_mean)
       d_mean
     })
-    
-    colnames(d_df)[1] <- "class"
-    
-    if(input$multicol==TRUE){
-      delfrom <- sum(n[-length(n)])+1
-      delto   <- sum(n)
-      copfrom <- sum(n[-length(n)+1:-length(n)])+1
-      copto   <- sum(n[-length(n)])
-      
-      if(input$balance==FALSE){
-        blength   <- dim(d_df[delfrom:delto,-1])[1]
-        multicopy <- d_df[copfrom:copto,-1] + rnorm(n[length(n)-1])
-        multicopy <- multicopy[sample(1:dim(multicopy)[1], blength, replace = F),]
-        d_df[delfrom:delto,-1] <- multicopy
-        
-      }else{
-        d_df[delfrom:delto,-1] <- d_df[copfrom:copto,-1]+rnorm(n[length(n)-1])
-      }
-      
-      colnames(d_df)[1] <- "class"
-    }
     
     output$downloadData <- downloadHandler(
       filename = function() {
@@ -188,7 +189,18 @@ server <- function(input, output) {
       d_df     <- rbind(d_df, now_df)
     }
     
+    if(input$multicol==TRUE){
+      whos <- as.numeric(unlist(strsplit(input$who,",")))
+      whos_mean <- d_mean[whos[1],]
+      
+      for(who in whos[-1]){
+        d_df[which(d_df[,1]==who),] <- cbind(who, rmvnorm(n=n[who], mean=whos_mean)+rnorm(n[who]))
+        d_mean[who,] <- whos_mean
+      }
+    }
+    
     d_df[,-1] <- round(d_df[,-1], input$resolution)
+    colnames(d_df)[1] <- "class"
     
     output$view2 <- renderTable({
       mean_class <- as.data.frame(1:input$tcount)
@@ -196,27 +208,6 @@ server <- function(input, output) {
       d_mean <- cbind(mean_class, d_mean)
       d_mean
     })
-    
-    colnames(d_df)[1] <- "class"
-    
-    if(input$multicol==TRUE){
-      delfrom <- sum(n[-length(n)])+1
-      delto   <- sum(n)
-      copfrom <- sum(n[-length(n)+1:-length(n)])+1
-      copto   <- sum(n[-length(n)])
-      
-      if(input$balance==FALSE){
-        blength   <- dim(d_df[delfrom:delto,-1])[1]
-        multicopy <- d_df[copfrom:copto,-1] + rnorm(n[length(n)-1])
-        multicopy <- multicopy[sample(1:dim(multicopy)[1], blength, replace = F),]
-        d_df[delfrom:delto,-1] <- multicopy
-        
-      }else{
-        d_df[delfrom:delto,-1] <- d_df[copfrom:copto,-1]+rnorm(n[length(n)-1])
-      }
-      
-      colnames(d_df)[1] <- "class"
-    }
     
     output$downloadData <- downloadHandler(
       filename = function() {
