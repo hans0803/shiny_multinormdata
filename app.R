@@ -54,7 +54,7 @@ ui <- fluidPage(
       ),
       
       tags$h5("(6) Is Data has multicollinearity problem?
-              if false please enter who"),
+              if TRUE, please enter who"),
       selectInput(inputId = "multicol",
                   label = "Multicollinearity:",
                   choices = c(FALSE, TRUE)
