@@ -6,8 +6,8 @@ library(MASS) # for lda
 
 ui <- fluidPage(
   
-  title = "Multinormal Data Builder",
-  titlePanel("Multinormal Data Builder"),
+  title = "Multivariate normal Data Creatater",
+  titlePanel("Multivariate normal Data Creatater"),
   
   sidebarLayout(
     
@@ -19,57 +19,49 @@ ui <- fluidPage(
       tags$h6(""),
       downloadButton("downloadData", "Download Data"),
       
-      tags$h5("(1) Seed is random?"),
       selectInput(inputId = "random",
                   label = "Random:",
                   choices = c(FALSE, TRUE)
       ),
       
-      tags$h5("(2) Mean range for every p"),
-      sliderInput(inputId = "mrange",
-                  label = "Choose a mean range:",
-                  min = 1, max = 10, value = 1, step = 1,
-                  animate = animationOptions(interval = 1000, loop = FALSE)
-      ),
-      
-      tags$h5("(3) P count about every multinorm"),
       sliderInput(inputId = "ncount",
-                  label = "Number of P:",
+                  label = "p (numbers of Multivariate normal):",
                   min = 2, max = 7, value = 2, step = 1,
                   animate = animationOptions(interval = 1000, loop = FALSE)
       ),
       
-      tags$h5("(4) Variable class count"),
+      sliderInput(inputId = "mrange",
+                  label = "Range of mean (uniform(-x, x)):",
+                  min = 1, max = 10, value = 1, step = 1,
+                  animate = animationOptions(interval = 1000, loop = FALSE)
+      ),
+      
       sliderInput(inputId = "tcount",
-                  label = "Number of classes:",
+                  label = "Group:",
                   min = 3, max = 7, value = 3, step = 1,
                   animate = animationOptions(interval = 1000, loop = FALSE)
       ),
       
-      tags$h5("(5) Resolution of digit"),
       sliderInput(inputId = "resolution",
                   label = "Digits:",
                   min = 0, max = 7, value = 2, step = 1,
                   animate = animationOptions(interval = 1000, loop = FALSE)
       ),
       
-      tags$h5("(6) Is Data has multicollinearity problem?
-              if TRUE, please enter who"),
       selectInput(inputId = "multicol",
-                  label = "Multicollinearity:",
+                  label = "Collinearity:",
                   choices = c(FALSE, TRUE)
       ),
       textInput(inputId = 'who', 
-                label = 'Who? enter a vector:', "1,2"),
+                label = 'Which groups are collinearity?', "1,2"),
       
-      tags$h5("(7) Is every class n count balance?
-              if unbalance, pleace input n's vector"),
+      
       selectInput(inputId = "balance",
-                  label = "Balance:",
+                  label = "Balance (for groups)",
                   choices = c(TRUE, FALSE)
       ),
       textInput(inputId = 'vector', 
-                label = 'Enter a vector:', "100,100,100")
+                label = 'Numbers of each group', "100,100,100")
       
     ),
     
