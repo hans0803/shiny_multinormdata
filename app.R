@@ -6,8 +6,8 @@ library(MASS) # for lda
 
 ui <- fluidPage(
   
-  title = "Multivariate normal Data Creatater",
-  titlePanel("Multivariate normal Data Creatater"),
+  title = "Multivariate normal Data Variations",
+  titlePanel("Multivariate normal Data Variations"),
   
   sidebarLayout(
     
@@ -19,13 +19,13 @@ ui <- fluidPage(
       tags$h6(""),
       downloadButton("downloadData", "Download Data"),
       
-      selectInput(inputId = "random",
-                  label = "Random:",
-                  choices = c(FALSE, TRUE)
-      ),
+      numericInput(inputId = 'seed', 
+                   label = 'Seed', 
+                   value = 611011106, 
+                   min = 1, max = 1000000000, step = 1),
       
       sliderInput(inputId = "ncount",
-                  label = "p (numbers of Multivariate normal):",
+                  label = "p (dimension):",
                   min = 2, max = 7, value = 2, step = 1,
                   animate = animationOptions(interval = 1000, loop = FALSE)
       ),
@@ -104,11 +104,7 @@ server <- function(input, output) {
       n <- rep(100, input$tcount)
     }
     
-    if(input$random==FALSE){
-      set.seed(611011106)
-    }else{
-      set.seed(sample(1:10000, 1))
-    }
+    set.seed(input$seed)
     
     d_mean <- c()
     d_df   <- data.frame()
@@ -165,11 +161,7 @@ server <- function(input, output) {
       n <- rep(100, input$tcount)
     }
     
-    if(input$random==FALSE){
-      set.seed(611011106)
-    }else{
-      set.seed(sample(1:10000, 1))
-    }
+    set.seed(input$seed)
     
     d_mean <- c()
     d_df   <- data.frame()
